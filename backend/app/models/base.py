@@ -1,0 +1,26 @@
+"""
+Configuração central do SQLAlchemy: engine, sessão e Base declarativa.
+Compartilhado por todos os módulos (auth, questions, interview).
+"""
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres:postgres@localhost:5432/entrevistaia",
+)
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+
+def get_db():
+    """Dependency do FastAPI para injetar uma sessão de banco por request."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
