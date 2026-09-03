@@ -1,0 +1,114 @@
+# EntrevistaIA
+
+**Simulador Inteligente de Entrevistas e Apresentações com Feedback de Oratória por Inteligência Artificial**
+
+Plataforma web para treinamento de comunicação de estudantes por meio de entrevistas simuladas, com perguntas geradas por IA e análise automática da fala.
+
+Projeto Final de Curso (PFC) — Bacharelado em Engenharia de Software, Universidade de Mogi das Cruzes (UMC).
+
+---
+
+## Sobre o projeto
+
+A comunicação oral é um dos fatores mais relevantes para o sucesso em entrevistas de emprego, apresentações acadêmicas e processos seletivos, mas grande parte dos estudantes não tem acesso a ambientes de treinamento que permitam praticar essas situações e receber retorno objetivo sobre o próprio desempenho.
+
+O **EntrevistaIA** propõe resolver essa lacuna com uma plataforma web que:
+- gera perguntas dinamicamente por meio de Inteligência Artificial, adaptadas à vaga ou ao tipo de apresentação escolhida;
+- transcreve as respostas faladas usando reconhecimento automático de fala (Speech-to-Text);
+- analisa a oratória do usuário, identificando métricas como vícios de linguagem, palavras repetidas, duração e velocidade da fala;
+- mantém um histórico de sessões para que o estudante acompanhe sua evolução ao longo do tempo.
+
+## Equipe
+
+| Integrante | RGM |
+|---|---|
+| Gabriel Sant'Anna Morais dos Santos | 11251401902 |
+| Leonardo Giampaglia Gomes | 11231103169 |
+| Letícia Teixeira da Rocha Batista | 11251401609 |
+
+**Orientador:** Prof. Alessandro Aparecido da Silva Horas
+
+## Links
+
+- **Protótipo:** [Excalidraw](https://excalidraw.com/#room=c32bc75f252f581eb196,eyeJOwdcVDtgzDAnt68_bw)
+
+---
+
+## Funcionalidades
+
+### MVP (primeira versão — escopo deste PFC)
+
+| # | Funcionalidade | Critério de aceitação |
+|---|---|---|
+| 1 | Cadastro, login e autenticação do usuário | Usuário cria conta e autentica-se com segurança (e-mail/senha) |
+| 2 | Seleção da vaga ou tipo de apresentação + exibição das perguntas geradas pela IA | Usuário escolhe uma categoria e recebe um conjunto de perguntas correspondente |
+| 3 | Entrevistador dinâmico (geração e adaptação de perguntas) | Ao menos uma pergunta subsequente é ajustada com base na resposta dada |
+| 4 | Captura de áudio e transcrição da resposta (Speech-to-Text) | Resposta falada é convertida em texto e exibida ao usuário |
+| 5 | Analisador de oratória (vícios de linguagem, repetições, duração, palavras por minuto) | Relatório apresenta as métricas quantitativas de cada resposta |
+| 6 | Histórico de entrevistas e painel de evolução | Usuário visualiza e compara métricas de sessões anteriores |
+| 9 | Avaliação do conteúdo das respostas por IA | IA analisa relevância, coerência e completude da resposta, com nota e feedback |
+
+**Fora do escopo do MVP:** análise de linguagem corporal por vídeo, integração com plataformas reais de recrutamento (além da API de vagas da Fase 2) e recursos de gamificação/comparação social entre usuários.
+
+### Fase 2 (roadmap futuro)
+
+| # | Funcionalidade | Critério de aceitação |
+|---|---|---|
+| 7 | Recomendação de vagas compatíveis com o perfil do aluno | Usuário recebe lista de vagas relacionadas às entrevistas praticadas |
+| 8 | Trilhas de estudo personalizadas | Usuário visualiza sugestões de estudo com base nas métricas de oratória |
+
+---
+
+## Arquitetura
+
+O sistema segue o modelo cliente-servidor, dividido em camadas de apresentação, processamento e persistência:
+
+- **Apresentação:** aplicação web em React, responsável pela interação com o usuário (gerenciamento das entrevistas, gravação de áudio, relatórios e evolução do desempenho).
+- **Processamento:** API REST em FastAPI, responsável pela autenticação, gerenciamento das entrevistas, transcrição, análise de oratória e integração com serviços externos de IA.
+- **Persistência:** PostgreSQL para dados relacionais; Redis para gerenciamento de tarefas assíncronas do processamento de áudio; armazenamento temporário para os arquivos de áudio.
+
+## Tecnologias
+
+| Categoria | Tecnologia |
+|---|---|
+| Front-end | React.js (TypeScript), Vite, TailwindCSS |
+| Back-end | Python, FastAPI |
+| Banco de dados | PostgreSQL, com SQLAlchemy (ORM) |
+| Filas / cache | Redis |
+| APIs de IA | OpenAI Whisper (Speech-to-Text); LLM para geração e adaptação de perguntas |
+| Testes | Pytest (back-end); Jest / React Testing Library (front-end) |
+| Segurança | JWT, bcrypt |
+| Versionamento | Git e GitHub |
+| Deploy | Front-end na Vercel; back-end no Render/Railway |
+
+## Metodologia
+
+Desenvolvimento conduzido com **Scrum** (SCHWABER; SUTHERLAND, 2020), com gestão das tarefas em quadro Kanban no Trello. Requisitos levantados por meio de histórias de usuário; modelagem apoiada em prototipação de telas e Diagrama de Casos de Uso (UML); validação por testes com usuários-piloto ao final de cada sprint.
+
+## Cronograma macro
+
+| Etapa | Período | Entregável |
+|---|---|---|
+| Definição e validação do problema | 03–21/08/2026 | Ficha de Caracterização do projeto |
+| Levantamento de requisitos | 22–28/08/2026 | Diagrama de Arquitetura, Introdução e Referências na monografia |
+| Modelagem e prototipação | 29/08–14/09/2026 | Primeira regra de negócio completa (front, back e banco) no GitHub |
+| Implementação — ciclo 1 | 15–28/09/2026 | Login, auditoria/log, LGPD, integração com API externa |
+| Implementação — ciclo 2 | 29/09–09/11/2026 | Requisitos funcionais/não funcionais, Diagrama de Classes, BPMN, 75% implementado |
+| Testes e validação | 10–23/11/2026 | Monografia completa, slides, vídeo demonstrativo, testes com ≥50% de cobertura |
+| Deploy e documentação | 30/11–07/12/2026 | Apresentação e defesa do PFC |
+| Preparação final | 11–17/12/2026 | Reentrega de ajustes solicitados pela banca |
+
+## Privacidade e LGPD
+
+O sistema trata dados pessoais do usuário (cadastro, áudio das respostas, transcrições e métricas de oratória). Os áudios são descartados após a transcrição, as senhas são armazenadas com criptografia (bcrypt) e o usuário pode excluir seu histórico a qualquer momento.
+
+## Como rodar o projeto localmente
+
+
+```
+
+Variáveis de ambiente necessárias (exemplo em `.env.example`): chaves da API de transcrição (Whisper), chave da API de LLM, string de conexão do PostgreSQL e do Redis.
+
+---
+
+Projeto acadêmico desenvolvido para o Projeto Final de Curso (PFC) de Engenharia de Software — UMC, 2026.
