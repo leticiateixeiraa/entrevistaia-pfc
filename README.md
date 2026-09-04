@@ -26,7 +26,7 @@ O **EntrevistaIA** propõe resolver essa lacuna com uma plataforma web que:
 | Leonardo Giampaglia Gomes | 11231103169 |
 | Letícia Teixeira da Rocha Batista | 11251401609 |
 
-**Orientador:** Prof. Alessandro Aparecido da Silva Horas
+**Orientador:** Prof. Viviane Guimaraes Ribeiro
 
 ## Links
 
