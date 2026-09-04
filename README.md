@@ -26,10 +26,11 @@ O **EntrevistaIA** propõe resolver essa lacuna com uma plataforma web que:
 | Leonardo Giampaglia Gomes | 11231103169 |
 | Letícia Teixeira da Rocha Batista | 11251401609 |
 
-**Orientador:** Prof. Viviane Guimaraes Ribeiro
+**Orientadora:** Prof. Viviane Guimaraes Ribeiro
 
 ## Links
 
+- **Repositório:** https://github.com/leticiateixeiraa/entrevistaia-pfc
 - **Protótipo:** [Excalidraw](https://excalidraw.com/#room=c32bc75f252f581eb196,eyeJOwdcVDtgzDAnt68_bw)
 
 ---
@@ -104,10 +105,58 @@ O sistema trata dados pessoais do usuário (cadastro, áudio das respostas, tran
 
 ## Como rodar o projeto localmente
 
+### Pré-requisitos
 
+- [Python 3.11+](https://www.python.org/downloads/)
+- [Node.js 18+](https://nodejs.org/)
+- [PostgreSQL](https://www.postgresql.org/download/) instalado e rodando
+- [pgAdmin 4](https://www.pgadmin.org/) (já vem junto com o instalador do PostgreSQL) para gerenciar o banco visualmente
+
+### 1. Crie o banco de dados
+
+Abra o pgAdmin, conecte no seu servidor PostgreSQL e crie um banco chamado `entrevistaia` (botão direito em Databases > Create > Database).
+
+> **Se aparecer erro de "incompatibilidade de versão de ordenação"** ao criar o banco: abra a Query Tool no banco `postgres` e rode `ALTER DATABASE template1 REFRESH COLLATION VERSION;`, depois tente criar o banco de novo.
+
+### 2. Configure o backend
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Mac/Linux
+pip install -r requirements.txt
 ```
 
-Variáveis de ambiente necessárias (exemplo em `.env.example`): chaves da API de transcrição (Whisper), chave da API de LLM, string de conexão do PostgreSQL e do Redis.
+Copie o `.env.example` para `.env` e ajuste a senha do seu PostgreSQL:
+
+```
+DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/entrevistaia
+JWT_SECRET_KEY=troque-por-uma-chave-secreta-forte
+PGOPTIONS=-c lc_messages=C
+```
+
+> A linha `PGOPTIONS=-c lc_messages=C` evita um erro de `UnicodeDecodeError` que acontece em instalações de PostgreSQL com mensagens de erro em português.
+
+### 3. Rode o backend
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Se aparecer `Application startup complete`, está tudo certo. Acesse **http://localhost:8000/docs** para testar os endpoints pela documentação interativa.
+
+### 4. Rode o frontend
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Acesse o endereço que aparecer no terminal (geralmente **http://localhost:5173**).
 
 ---
 
