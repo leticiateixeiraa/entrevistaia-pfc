@@ -1,5 +1,5 @@
-// feat(auth-frontend): cria tela de cadastro com validação de formulário
-import { useState, FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { register } from "../services/authService";
 
 export default function Register() {
@@ -21,7 +21,6 @@ export default function Register() {
     setLoading(true);
     try {
       await register({ email, password, name });
-      // TODO: redirecionar para a tela de login (ou já logar automaticamente)
     } catch (err: any) {
       setError(err?.response?.data?.detail ?? "Não foi possível criar a conta.");
     } finally {
@@ -30,40 +29,50 @@ export default function Register() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Criar conta</h1>
+    <form className="auth-form" onSubmit={handleSubmit}>
+      <h2>Criar conta</h2>
 
-      <label>
-        Nome
-        <input value={name} onChange={(e) => setName(e.target.value)} />
-      </label>
-
-      <label>
-        E-mail
+      <div className="field">
+        <label htmlFor="register-name">Nome</label>
         <input
+          id="register-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="register-email">E-mail</label>
+        <input
+          id="register-email"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-      </label>
+      </div>
 
-      <label>
-        Senha
+      <div className="field">
+        <label htmlFor="register-password">Senha</label>
         <input
+          id="register-password"
           type="password"
           required
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-      </label>
+      </div>
 
-      {error && <p role="alert">{error}</p>}
+      {error && <p className="error-text" role="alert">{error}</p>}
 
-      <button type="submit" disabled={loading}>
+      <button className="btn-primary" type="submit" disabled={loading}>
         {loading ? "Criando..." : "Criar conta"}
       </button>
+
+      <p className="auth-switch">
+        Já tem conta? <Link to="/login">Entrar</Link>
+      </p>
     </form>
   );
 }
