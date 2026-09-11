@@ -29,31 +29,39 @@ export default function Register() {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2>Criar conta</h2>
+    <form onSubmit={handleSubmit}>
+      <h2 className="font-display text-2xl font-semibold mb-8">Criar conta</h2>
 
-      <div className="field">
-        <label htmlFor="register-name">Nome</label>
+      <div className="mb-5 text-left">
+        <label htmlFor="register-name" className="block text-sm text-text-400 mb-1.5">
+          Nome
+        </label>
         <input
           id="register-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          className="w-full bg-ink-800 border border-ink-700 rounded px-3 py-2.5 text-sm text-text-100 focus:outline-none focus:border-amber-500"
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="register-email">E-mail</label>
+      <div className="mb-5 text-left">
+        <label htmlFor="register-email" className="block text-sm text-text-400 mb-1.5">
+          E-mail
+        </label>
         <input
           id="register-email"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full bg-ink-800 border border-ink-700 rounded px-3 py-2.5 text-sm text-text-100 focus:outline-none focus:border-amber-500"
         />
       </div>
 
-      <div className="field">
-        <label htmlFor="register-password">Senha</label>
+      <div className="mb-5 text-left">
+        <label htmlFor="register-password" className="block text-sm text-text-400 mb-1.5">
+          Senha
+        </label>
         <input
           id="register-password"
           type="password"
@@ -61,17 +69,29 @@ export default function Register() {
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full bg-ink-800 border border-ink-700 rounded px-3 py-2.5 text-sm text-text-100 focus:outline-none focus:border-amber-500"
         />
       </div>
 
-      {error && <p className="error-text" role="alert">{error}</p>}
+      {error && (
+        <p role="alert" className="text-red-400 text-sm -mt-2 mb-5">
+          {error}
+        </p>
+      )}
 
-      <button className="btn-primary" type="submit" disabled={loading}>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-amber-500 text-ink-950 rounded py-3 font-semibold text-sm cursor-pointer hover:bg-amber-400 disabled:opacity-60 disabled:cursor-default"
+      >
         {loading ? "Criando..." : "Criar conta"}
       </button>
 
-      <p className="auth-switch">
-        Já tem conta? <Link to="/login">Entrar</Link>
+      <p className="mt-6 text-sm text-text-400">
+        Já tem conta?{" "}
+        <Link to="/login" className="text-amber-500 hover:underline">
+          Entrar
+        </Link>
       </p>
     </form>
   );
