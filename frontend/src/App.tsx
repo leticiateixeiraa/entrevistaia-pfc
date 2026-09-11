@@ -4,11 +4,15 @@ import Register from "./pages/Register";
 
 function App() {
   return (
-    <div className="auth-shell">
-      <div className="auth-panel">
-        <div className="auth-brand">
-          <h1>EntrevistaIA</h1>
-          <p>Porque uma boa oportunidade começa com a confiança de saber se comunicar.</p>
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-sm bg-ink-900 border border-ink-700 rounded-lg p-10">
+        <div className="mb-8">
+          <h1 className="font-display text-2xl font-semibold tracking-tight">
+            EntrevistaIA
+          </h1>
+          <p className="font-display italic font-medium text-amber-400 mt-2.5 leading-snug">
+            Porque uma boa oportunidade começa com a confiança de saber se comunicar.
+          </p>
         </div>
 
         <Routes>
