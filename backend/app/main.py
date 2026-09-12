@@ -21,6 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+print("hello")
+
 app.include_router(auth_router)
 # app.include_router(questions_router)
 # app.include_router(interview_router)
