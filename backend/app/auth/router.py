@@ -1,11 +1,15 @@
 """
 feat(auth-backend): implementa endpoint POST /auth/register
 feat(auth-backend): implementa endpoint POST /auth/login com JWT
+feat(auth-backend): implementa endpoint GET /auth/me
 """
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.base import get_db
+from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.auth.schemas import UserCreate, UserLogin, UserOut, Token
 from app.auth.service import hash_password, verify_password, create_access_token
@@ -38,3 +42,10 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 
     access_token = create_access_token(user_id=str(user.id))
     return Token(access_token=access_token)
+
+@router.get("/me", response_model=UserOut)
+def me(user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == uuid.UUID(user_id)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    return user
