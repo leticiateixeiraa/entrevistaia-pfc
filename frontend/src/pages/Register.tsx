@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { register } from "../services/authService";
+import { Link, useNavigate } from "react-router-dom";
+import { login, register } from "../services/authService";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -21,9 +22,12 @@ export default function Register() {
     setLoading(true);
     try {
       await register({ email, password, name });
+      // /auth/register não devolve token — loga em seguida com as mesmas
+      // credenciais pra já entrar autenticado, sem pedir de novo.
+      await login({ email, password });
+      navigate("/welcome");
     } catch (err: any) {
       setError(err?.response?.data?.detail ?? "Não foi possível criar a conta.");
-    } finally {
       setLoading(false);
     }
   }

@@ -13,6 +13,12 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface CurrentUser {
+  id: string;
+  email: string;
+  name: string | null;
+}
+
 export async function register(payload: RegisterPayload) {
   const { data } = await api.post("/auth/register", payload);
   return data;
@@ -33,4 +39,10 @@ export function logout() {
 
 export function isAuthenticated(): boolean {
   return Boolean(localStorage.getItem("access_token"));
+}
+
+// feat(auth-frontend): busca os dados do usuário autenticado (GET /auth/me)
+export async function getCurrentUser(): Promise<CurrentUser> {
+  const { data } = await api.get<CurrentUser>("/auth/me");
+  return data;
 }

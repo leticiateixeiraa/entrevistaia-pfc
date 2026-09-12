@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -14,9 +15,9 @@ export default function Login() {
     setLoading(true);
     try {
       await login({ email, password });
+      navigate("/welcome");
     } catch (err: any) {
       setError(err?.response?.data?.detail ?? "E-mail ou senha inválidos.");
-    } finally {
       setLoading(false);
     }
   }
