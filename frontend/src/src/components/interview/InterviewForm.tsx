@@ -16,12 +16,24 @@ export function InterviewForm({ isSubmitting, onSubmit }: InterviewFormProps) {
   const [jobTitle, setJobTitle] = useState("");
   const [presentationType, setPresentationType] = useState("");
   const [jobDescription, setJobDescription] = useState("");
-
-  const isValid = jobTitle.trim().length > 0 && presentationType.length > 0;
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isValid || isSubmitting) return;
+    if (isSubmitting) return;
+    if (!jobTitle.trim()) {
+      setValidationMessage("Informe o cargo da vaga.");
+      return;
+    }
+    if (!presentationType) {
+      setValidationMessage("Selecione o tipo de entrevista.");
+      return;
+    }
+    if (jobDescription.trim().length < 20) {
+      setValidationMessage("Descreva a vaga com pelo menos 20 caracteres.");
+      return;
+    }
+    setValidationMessage(null);
     onSubmit({ jobTitle: jobTitle.trim(), presentationType, jobDescription: jobDescription.trim() });
   }
 
@@ -70,8 +82,7 @@ export function InterviewForm({ isSubmitting, onSubmit }: InterviewFormProps) {
       <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline justify-between">
           <label htmlFor="job-description" className="text-sm font-medium text-card-foreground">
-            Descrição da vaga{" "}
-            <span className="font-normal text-muted-foreground">(opcional)</span>
+            Descrição da vaga
           </label>
           {jobDescription.length > 0 && (
             <span className="text-xs text-muted-foreground">{jobDescription.length} caracteres</span>
@@ -83,13 +94,22 @@ export function InterviewForm({ isSubmitting, onSubmit }: InterviewFormProps) {
           onChange={(e) => setJobDescription(e.target.value)}
           placeholder="Cole aqui a descrição da vaga, requisitos ou principais responsabilidades."
           rows={5}
+          required
           className="resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
+        <span className="text-xs text-muted-foreground">
+          Informe pelo menos 20 caracteres para a IA gerar perguntas específicas.
+        </span>
+        {validationMessage && (
+          <p className="text-sm text-destructive" role="alert">
+            {validationMessage}
+          </p>
+        )}
       </div>
 
       <button
         type="submit"
-        disabled={!isValid || isSubmitting}
+        disabled={isSubmitting}
         className="mt-1 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting && (

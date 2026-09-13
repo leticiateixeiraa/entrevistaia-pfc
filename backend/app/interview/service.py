@@ -22,7 +22,7 @@ import uuid
 
 from sqlalchemy.orm import Session
 
-from app.interview.models import InterviewAnswer, InterviewSession
+from app.interview.models import InterviewAnswer, InterviewQuestion, InterviewSession
 
 QUESTION_BANK: dict[str, list[str]] = {
     "entrevista_de_emprego": [
@@ -69,6 +69,18 @@ def _valid_category(category: str) -> str:
 def _question_at(category: str, index: int) -> str | None:
     bank = QUESTION_BANK[_valid_category(category)]
     return bank[index] if index < len(bank) else None
+
+
+def _session_question_at(db: Session, session: InterviewSession, index: int) -> str | None:
+    question = (
+        db.query(InterviewQuestion)
+        .filter(
+            InterviewQuestion.session_id == session.id,
+            InterviewQuestion.order_index == index,
+        )
+        .first()
+    )
+    return question.text if question else _question_at(session.category, index)
 
 
 def start_mock_session(db: Session, user_id: uuid.UUID, category: str) -> InterviewSession:
@@ -138,7 +150,10 @@ def register_answer_and_get_next(
     )
 
     category = _valid_category(session.category)
-    max_questions = len(QUESTION_BANK[category])
+    generated_count = db.query(InterviewQuestion).filter(
+        InterviewQuestion.session_id == session.id
+    ).count()
+    max_questions = generated_count or len(QUESTION_BANK[category])
     next_index = session.current_index + 1
 
     if next_index >= max_questions:
@@ -148,12 +163,10 @@ def register_answer_and_get_next(
         return None, False, True
 
     next_question, adapted = _adapt_next_question(category, answer_text, next_index)
-
-    # Só avança o índice do banco fixo quando a pergunta NÃO foi um desvio
-    # adaptado — senão a próxima pergunta "de verdade" do roteiro seria
-    # pulada sem nunca ter sido feita.
     if not adapted:
-        session.current_index = next_index
+        next_question = _session_question_at(db, session, next_index)
+
+    session.current_index = next_index
 
     session.current_question_text = next_question
     session.finished = False

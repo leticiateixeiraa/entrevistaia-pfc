@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-ro
 import { useState } from "react";
 import { ProgressIndicator } from "@/components/interview/ProgressIndicator";
 import { QuestionCard } from "@/components/interview/QuestionCard";
+import { ApiError, submitAnswer } from "@/services/interviewApi";
 import { getInterviewSession, clearInterviewSession } from "@/services/interviewSession";
 import { presentationTypeLabel } from "@/types/interview";
 
@@ -54,15 +55,37 @@ function InterviewQuestionsPage() {
 
   const { request, response } = session;
   const questions = [...response.questions].sort((a, b) => a.order - b.order);
-  const currentQuestion = questions[currentIndex];
+  const [answer, setAnswer] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [adaptedQuestion, setAdaptedQuestion] = useState<string | null>(null);
+  const currentQuestion = adaptedQuestion
+    ? { order: currentIndex + 1, text: adaptedQuestion }
+    : questions[currentIndex];
   if (!currentQuestion) return null;
 
-  const isFirst = currentIndex === 0;
   const isLast = currentIndex === questions.length - 1;
 
-  function handleFinish() {
-    clearInterviewSession();
-    navigate({ to: "/interview/setup" });
+  async function handleAnswer() {
+    if (!answer.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const result = await submitAnswer(response.session_id, answer.trim());
+      if (result.finished || isLast) {
+        clearInterviewSession();
+        navigate({ to: "/interview/setup" });
+        return;
+      }
+      setAnswer("");
+      setAdaptedQuestion(result.adapted ? result.question : null);
+      setCurrentIndex((index) => index + 1);
+    } catch (error) {
+      setErrorMessage(error instanceof ApiError ? error.message : "Não foi possível enviar a resposta.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -83,33 +106,28 @@ function InterviewQuestionsPage() {
           <QuestionCard questionText={currentQuestion.text} />
         </div>
 
+        <label className="mt-8 flex flex-col gap-2 text-sm font-medium text-card-foreground">
+          Sua resposta
+          <textarea
+            value={answer}
+            onChange={(event) => setAnswer(event.target.value)}
+            placeholder="Escreva sua resposta com detalhes..."
+            rows={5}
+            className="resize-none rounded-lg border border-input bg-card px-3 py-3 font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </label>
+
+        {errorMessage && <p className="mt-3 text-sm text-destructive" role="alert">{errorMessage}</p>}
+
         <nav className="mt-8 flex items-center justify-between gap-3">
           <button
             type="button"
-            onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-            disabled={isFirst}
-            className="rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleAnswer}
+            disabled={isSubmitting || !answer.trim()}
+            className="ml-auto rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Pergunta anterior
+            {isSubmitting ? "Enviando..." : isLast ? "Finalizar entrevista" : "Enviar resposta"}
           </button>
-
-          {isLast ? (
-            <button
-              type="button"
-              onClick={handleFinish}
-              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Finalizar
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1))}
-              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Próxima pergunta
-            </button>
-          )}
         </nav>
 
         <div className="mt-6 text-center">

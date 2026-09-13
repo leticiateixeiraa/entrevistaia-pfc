@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CategoryOut(BaseModel):
@@ -12,7 +12,7 @@ class CategoryOut(BaseModel):
 class StartInterviewIn(BaseModel):
     job_title: str
     presentation_type: str
-    job_description: str | None = None
+    job_description: str = Field(min_length=20)
 
 
 class InterviewSessionOut(BaseModel):

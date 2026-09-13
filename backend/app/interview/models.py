@@ -46,6 +46,16 @@ class InterviewSession(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class InterviewQuestion(Base):
+    __tablename__ = "interview_questions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("interview_sessions.id"), nullable=False, index=True)
+    order_index = Column(Integer, nullable=False)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class InterviewAnswer(Base):
     __tablename__ = "interview_answers"
 

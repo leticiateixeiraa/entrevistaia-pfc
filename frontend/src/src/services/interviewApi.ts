@@ -15,6 +15,21 @@ export class ApiError extends Error {
   }
 }
 
+export type AnswerResponse = {
+  session_id: string;
+  question: string | null;
+  order_index: number;
+  finished: boolean;
+  adapted: boolean;
+};
+
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
+  };
+}
+
 async function createInterviewReal(
   request: InterviewRequest,
 ): Promise<InterviewResponse> {
@@ -22,10 +37,7 @@ async function createInterviewReal(
   try {
     response = await fetch(`${API_BASE_URL}/interviews`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-      },
+      headers: authHeaders(),
       body: JSON.stringify(request),
     });
   } catch {
@@ -33,6 +45,12 @@ async function createInterviewReal(
   }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem("access_token");
+      window.location.assign("/");
+      throw new ApiError("Sua sessão expirou. Faça login novamente.", 401);
+    }
+
     // O backend retorna erros no padrão { "detail": "mensagem" }.
     let detail: string | undefined;
     try {
@@ -58,6 +76,30 @@ async function createInterviewReal(
       typeof question === "string" ? { order: index + 1, text: question } : question,
     ),
   };
+}
+
+export async function submitAnswer(
+  sessionId: string,
+  answerText: string,
+): Promise<AnswerResponse> {
+  const response = await fetch(`${API_BASE_URL}/interviews/${sessionId}/answer`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ answer_text: answerText }),
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem("access_token");
+    window.location.assign("/");
+    throw new ApiError("Sua sessão expirou. Faça login novamente.", 401);
+  }
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => ({}))) as { detail?: string };
+    throw new ApiError(body.detail ?? "Não foi possível enviar a resposta.", response.status);
+  }
+
+  return (await response.json()) as AnswerResponse;
 }
 
 export async function createInterview(
