@@ -11,7 +11,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:megui123@localhost:5432/entrevistaia",
+    "postgresql://postgres:hsegb366@localhost:5432/entrevistaia",
 )
 
 engine = create_engine(

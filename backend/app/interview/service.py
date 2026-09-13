@@ -23,6 +23,7 @@ import uuid
 from sqlalchemy.orm import Session
 
 from app.interview.models import InterviewAnswer, InterviewQuestion, InterviewSession
+from app.questions.llm_service import LLMGenerationError, generate_adapted_question
 
 QUESTION_BANK: dict[str, list[str]] = {
     "entrevista_de_emprego": [
@@ -162,9 +163,31 @@ def register_answer_and_get_next(
         db.commit()
         return None, False, True
 
-    next_question, adapted = _adapt_next_question(category, answer_text, next_index)
-    if not adapted:
-        next_question = _session_question_at(db, session, next_index)
+    if generated_count:
+        previous_answers = [
+            (answer.question_text, answer.answer_text)
+            for answer in db.query(InterviewAnswer)
+            .filter(InterviewAnswer.session_id == session.id)
+            .order_by(InterviewAnswer.order_index)
+            .all()
+        ]
+        try:
+            next_question = generate_adapted_question(
+                current_question,
+                answer_text,
+                previous_answers,
+            )
+            adapted = True
+        except LLMGenerationError:
+            next_question, adapted = _adapt_next_question(
+                category, answer_text, next_index
+            )
+            if not adapted:
+                next_question = _session_question_at(db, session, next_index)
+    else:
+        next_question, adapted = _adapt_next_question(category, answer_text, next_index)
+        if not adapted:
+            next_question = _session_question_at(db, session, next_index)
 
     session.current_index = next_index
 
