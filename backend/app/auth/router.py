@@ -6,6 +6,7 @@ feat(auth-backend): implementa endpoint GET /auth/me
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.base import get_db
@@ -19,12 +20,13 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == user_in.email).first()
+    email = str(user_in.email).strip().lower()
+    existing = db.query(User).filter(func.lower(User.email) == email).first()
     if existing:
         raise HTTPException(status_code=400, detail="E-mail já cadastrado")
 
     user = User(
-        email=user_in.email,
+        email=email,
         hashed_password=hash_password(user_in.password),
         name=user_in.name,
     )
@@ -36,7 +38,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == credentials.email).first()
+    email = str(credentials.email).strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == email).first()
     if not user or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="E-mail ou senha inválidos")
 
