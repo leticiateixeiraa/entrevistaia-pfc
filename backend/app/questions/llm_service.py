@@ -62,3 +62,52 @@ def generate_questions(
     if len(cleaned) < 5:
         raise LLMGenerationError("O LLM retornou menos de 5 perguntas")
     return cleaned[:5]
+
+
+def generate_adapted_question(
+    current_question: str,
+    answer_text: str,
+    previous_answers: list[tuple[str, str]],
+) -> str:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise LLMGenerationError(
+            "GEMINI_API_KEY não configurada. Adicione uma chave do Gemini no arquivo backend/.env."
+        )
+
+    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    history = "\n".join(
+        f"Pergunta: {question}\nResposta: {answer}"
+        for question, answer in previous_answers
+    )
+    prompt = (
+        "Crie a próxima pergunta de uma entrevista em português do Brasil. "
+        "Adapte-a ao conteúdo da resposta atual e ao histórico, aprofundando "
+        "um ponto relevante sem repetir perguntas. Retorne somente JSON válido "
+        'no formato {"question": "..."}.\n\n'
+        f"Histórico:\n{history or 'Nenhum'}\n\n"
+        f"Pergunta atual: {current_question}\n"
+        f"Resposta atual: {answer_text}"
+    )
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model=model,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=(
+                    "Você é um entrevistador atento. Faça uma pergunta por vez, "
+                    "clara, específica e diretamente relacionada à resposta."
+                ),
+                temperature=0.7,
+                response_mime_type="application/json",
+            ),
+        )
+        question = json.loads(response.text or "{}").get("question")
+    except Exception as error:
+        raise LLMGenerationError("Não foi possível adaptar a próxima pergunta") from error
+
+    if not isinstance(question, str) or not question.strip():
+        raise LLMGenerationError("O LLM retornou uma pergunta adaptada inválida")
+    return question.strip()
