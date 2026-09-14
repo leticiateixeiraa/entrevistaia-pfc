@@ -72,11 +72,11 @@ O sistema segue o modelo cliente-servidor, dividido em camadas de apresentação
 
 | Categoria | Tecnologia |
 |---|---|
-| Front-end | React.js (TypeScript), Vite, TailwindCSS |
+| Front-end | React.js (TypeScript), Vite, TanStack Router/Start, TailwindCSS, shadcn/ui |
 | Back-end | Python, FastAPI |
 | Banco de dados | PostgreSQL, com SQLAlchemy (ORM) |
 | Filas / cache | Redis |
-| APIs de IA | OpenAI Whisper (Speech-to-Text); LLM para geração e adaptação de perguntas |
+| APIs de IA | OpenAI Whisper (Speech-to-Text); Google Gemini para geração e adaptação de perguntas |
 | Testes | Pytest (back-end); Jest / React Testing Library (front-end) |
 | Segurança | JWT, bcrypt |
 | Versionamento | Git e GitHub |
@@ -133,10 +133,10 @@ Copie o `.env.example` para `.env` e ajuste a senha do seu PostgreSQL:
 ```
 DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/entrevistaia
 JWT_SECRET_KEY=troque-por-uma-chave-secreta-forte
-PGOPTIONS=-c lc_messages=C
-```
+GEMINI_API_KEY=sua-chave-do-gemini-aqui
 
-> A linha `PGOPTIONS=-c lc_messages=C` evita um erro de `UnicodeDecodeError` que acontece em instalações de PostgreSQL com mensagens de erro em português.
+Para gerar a `GEMINI_API_KEY`, crie uma chave gratuita em https://aistudio.google.com/apikey.
+```
 
 ### 3. Rode o backend
 
