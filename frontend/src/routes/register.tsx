@@ -1,18 +1,19 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { login } from "../../services/authService";
+import { login, register } from "../services/authService";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/register")({
   beforeLoad: () => {
     if (localStorage.getItem("access_token")) {
       throw redirect({ to: "/interview/setup" });
     }
   },
-  component: LoginPage,
+  component: RegisterPage,
 });
 
-function LoginPage() {
+function RegisterPage() {
   const navigate = useNavigate();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -21,13 +22,19 @@ function LoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setIsSubmitting(true);
 
+    if (password.length < 8) {
+      setError("A senha precisa ter pelo menos 8 caracteres.");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
+      await register({ name, email, password });
       await login({ email, password });
       navigate({ to: "/interview/setup" });
     } catch (requestError: any) {
-      setError(requestError?.response?.data?.detail ?? "E-mail ou senha inválidos.");
+      setError(requestError?.response?.data?.detail ?? "Não foi possível criar a conta.");
       setIsSubmitting(false);
     }
   }
@@ -39,12 +46,20 @@ function LoginPage() {
         className="w-full max-w-md rounded-2xl border border-border bg-card p-7 shadow-sm sm:p-9"
       >
         <p className="mb-2 text-sm font-semibold tracking-wide text-primary">EntrevistaIA</p>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Bem-vindo de volta</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Crie sua conta</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Entre para preparar sua próxima entrevista simulada.
+          Comece a praticar sua comunicação com entrevistas simuladas.
         </p>
 
         <div className="mt-8 flex flex-col gap-5">
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-card-foreground">
+            Nome
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="rounded-lg border border-input bg-background px-3 py-2.5 font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+          </label>
           <label className="flex flex-col gap-1.5 text-sm font-medium text-card-foreground">
             E-mail
             <input
@@ -55,12 +70,12 @@ function LoginPage() {
               className="rounded-lg border border-input bg-background px-3 py-2.5 font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
           </label>
-
           <label className="flex flex-col gap-1.5 text-sm font-medium text-card-foreground">
             Senha
             <input
               type="password"
               required
+              minLength={8}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className="rounded-lg border border-input bg-background px-3 py-2.5 font-normal text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -75,13 +90,13 @@ function LoginPage() {
           disabled={isSubmitting}
           className="mt-7 w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "Entrando..." : "Entrar"}
+          {isSubmitting ? "Criando..." : "Criar conta"}
         </button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Ainda não tem conta?{" "}
-          <Link to="/register" className="font-medium text-primary hover:underline">
-            Criar conta
+          Já tem conta?{" "}
+          <Link to="/" className="font-medium text-primary hover:underline">
+            Entrar
           </Link>
         </p>
       </form>
