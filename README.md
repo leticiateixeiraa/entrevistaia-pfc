@@ -1,4 +1,4 @@
-# EntrevistaIA
+# StartAI
 
 **Simulador Inteligente de Entrevistas e Apresentações com Feedback de Oratória por Inteligência Artificial**
 
@@ -12,7 +12,7 @@ Projeto Final de Curso (PFC) — Bacharelado em Engenharia de Software, Universi
 
 A comunicação oral é um dos fatores mais relevantes para o sucesso em entrevistas de emprego, apresentações acadêmicas e processos seletivos, mas grande parte dos estudantes não tem acesso a ambientes de treinamento que permitam praticar essas situações e receber retorno objetivo sobre o próprio desempenho.
 
-O **EntrevistaIA** propõe resolver essa lacuna com uma plataforma web que:
+O **StartAI** propõe resolver essa lacuna com uma plataforma web que:
 - gera perguntas dinamicamente por meio de Inteligência Artificial, adaptadas à vaga ou ao tipo de apresentação escolhida;
 - transcreve as respostas faladas usando reconhecimento automático de fala (Speech-to-Text);
 - analisa a oratória do usuário, identificando métricas como vícios de linguagem, palavras repetidas, duração e velocidade da fala;
