@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as InterviewQuestionsRouteImport } from './routes/interview/questions'
 import { Route as InterviewSetupRouteImport } from './routes/interview/setup'
+import { Route as AuditRouteImport } from './routes/audit'
+import { Route as HomeRouteImport } from './routes/home'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +36,32 @@ const InterviewSetupRoute = InterviewSetupRouteImport.update({
   path: '/interview/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuditRoute = AuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
+  '/audit': typeof AuditRoute
+  '/home': typeof HomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
+  '/audit': typeof AuditRoute
+  '/home': typeof HomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +69,15 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
+  '/audit': typeof AuditRoute
+  '/home': typeof HomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/register' | '/interview/questions' | '/interview/setup'
+  fullPaths: '/' | '/register' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/register' | '/interview/questions' | '/interview/setup'
-  id: '__root__' | '/' | '/register' | '/interview/questions' | '/interview/setup'
+  to: '/' | '/register' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
+  id: '__root__' | '/' | '/register' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -99,6 +117,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InterviewSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/audit': {
+      id: '/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +139,8 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   InterviewQuestionsRoute: InterviewQuestionsRoute,
   InterviewSetupRoute: InterviewSetupRoute,
+  AuditRoute: AuditRoute,
+  HomeRoute: HomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

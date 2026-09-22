@@ -1,4 +1,4 @@
-# EntrevistaIA
+# StartAI
 
 **Simulador Inteligente de Entrevistas e Apresentações com Feedback de Oratória por Inteligência Artificial**
 
@@ -12,7 +12,7 @@ Projeto Final de Curso (PFC) — Bacharelado em Engenharia de Software, Universi
 
 A comunicação oral é um dos fatores mais relevantes para o sucesso em entrevistas de emprego, apresentações acadêmicas e processos seletivos, mas grande parte dos estudantes não tem acesso a ambientes de treinamento que permitam praticar essas situações e receber retorno objetivo sobre o próprio desempenho.
 
-O **EntrevistaIA** propõe resolver essa lacuna com uma plataforma web que:
+O **StartAI** propõe resolver essa lacuna com uma plataforma web que:
 - gera perguntas dinamicamente por meio de Inteligência Artificial, adaptadas à vaga ou ao tipo de apresentação escolhida;
 - transcreve as respostas faladas usando reconhecimento automático de fala (Speech-to-Text);
 - analisa a oratória do usuário, identificando métricas como vícios de linguagem, palavras repetidas, duração e velocidade da fala;
@@ -102,6 +102,31 @@ Desenvolvimento conduzido com **Scrum** (SCHWABER; SUTHERLAND, 2020), com gestã
 ## Privacidade e LGPD
 
 O sistema trata dados pessoais do usuário (cadastro, áudio das respostas, transcrições e métricas de oratória). Os áudios são descartados após a transcrição, as senhas são armazenadas com criptografia (bcrypt) e o usuário pode excluir seu histórico a qualquer momento.
+
+## Auditoria e logs
+
+O backend registra eventos relevantes na tabela `audit_logs`. Cada evento pode
+conter usuário, ação, recurso afetado, identificador do recurso, data/hora,
+endereço IP e detalhes adicionais em JSON serializado. São registrados eventos
+de autenticação, início e respostas de entrevistas e alterações no roadmap.
+
+O usuário autenticado consulta seus próprios eventos em `GET /audit/logs`, com
+os filtros `limit` e `action`. A consulta usa o identificador extraído do JWT,
+impedindo que um usuário visualize os logs de outro usuário.
+
+## Roadmap de ensino personalizado
+
+Um roadmap é criado por usuário em `POST /roadmaps`, com objetivo e etapas
+ordenadas. Cada etapa começa como `pending` e pode ser alterada para
+`in_progress` ou `completed` em
+`PATCH /roadmaps/{roadmap_id}/items/{item_id}`. A aplicação pode gerar as
+etapas a partir dos pontos fracos observados nas entrevistas: respostas
+comportamentais curtas viram prática da estrutura STAR, desempenho técnico
+baixo vira revisão do assunto e problemas de clareza viram treino de
+apresentação. `GET /roadmaps` retorna os planos do usuário.
+
+As modalidades `comportamental`, `tecnica`, `mista` e `apresentacao_pessoal`
+possuem regras próprias no prompt do Gemini.
 
 ## Como rodar o projeto localmente
 

@@ -14,6 +14,7 @@ from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.auth.schemas import UserCreate, UserLogin, UserOut, Token
 from app.auth.service import hash_password, verify_password, create_access_token
+from app.audit.service import record_event
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -33,6 +34,8 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    record_event(db, "auth.registered", user.id, "user", str(user.id))
+    db.commit()
     return user
 
 
@@ -44,6 +47,8 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="E-mail ou senha inválidos")
 
     access_token = create_access_token(user_id=str(user.id))
+    record_event(db, "auth.login", user.id, "user", str(user.id))
+    db.commit()
     return Token(access_token=access_token)
 
 @router.get("/me", response_model=UserOut)

@@ -17,10 +17,26 @@ export type InterviewResponse = {
 };
 
 export const PRESENTATION_TYPES = [
-  { value: "comportamental", label: "Comportamental" },
-  { value: "tecnica", label: "Técnica" },
-  { value: "mista", label: "Mista" },
-  { value: "apresentacao_pessoal", label: "Apresentação pessoal" },
+  {
+    value: "comportamental",
+    label: "Comportamental",
+    description: "Situações reais, decisões e resultados usando a estrutura STAR.",
+  },
+  {
+    value: "tecnica",
+    label: "Técnica",
+    description: "Conhecimentos técnicos, raciocínio e resolução prática de problemas.",
+  },
+  {
+    value: "mista",
+    label: "Mista",
+    description: "Entrevista equilibrada, combinando perguntas comportamentais e técnicas.",
+  },
+  {
+    value: "apresentacao_pessoal",
+    label: "Apresentação pessoal",
+    description: "Trajetória, motivação, clareza e organização da sua narrativa.",
+  },
 ] as const;
 
 export function presentationTypeLabel(value: string): string {

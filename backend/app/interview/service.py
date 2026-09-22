@@ -94,6 +94,7 @@ def start_mock_session(db: Session, user_id: uuid.UUID, category: str) -> Interv
     session = InterviewSession(
         user_id=user_id,
         category=category,
+        presentation_type=category,
         current_index=0,
         current_question_text=_question_at(category, 0),
         finished=False,
@@ -176,6 +177,7 @@ def register_answer_and_get_next(
                 current_question,
                 answer_text,
                 previous_answers,
+                session.presentation_type,
             )
             adapted = True
         except LLMGenerationError:

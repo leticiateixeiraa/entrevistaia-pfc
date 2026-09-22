@@ -5,7 +5,7 @@ import { login } from "../services/authService";
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
     if (localStorage.getItem("access_token")) {
-      throw redirect({ to: "/interview/setup" });
+      throw redirect({ to: "/home" });
     }
   },
   component: LoginPage,
@@ -25,7 +25,7 @@ function LoginPage() {
 
     try {
       await login({ email, password });
-      navigate({ to: "/interview/setup" });
+      navigate({ to: "/home" });
     } catch (requestError: any) {
       setError(requestError?.response?.data?.detail ?? "E-mail ou senha inválidos.");
       setIsSubmitting(false);
@@ -38,7 +38,7 @@ function LoginPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-2xl border border-border bg-card p-7 shadow-sm sm:p-9"
       >
-        <p className="mb-2 text-sm font-semibold tracking-wide text-primary">EntrevistaIA</p>
+        <p className="mb-2 text-sm font-semibold tracking-wide text-primary">StartAI</p>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Bem-vindo de volta</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           Entre para preparar sua próxima entrevista simulada.
