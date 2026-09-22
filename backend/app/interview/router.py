@@ -15,11 +15,44 @@ from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
 from app.interview import service
-from app.interview.models import InterviewSession
-from app.interview.schemas import AnswerIn, NextQuestionOut, StartInterviewIn, StartInterviewOut
+from app.interview.models import InterviewAnswer, InterviewSession
+from app.interview.schemas import (
+    AnswerIn,
+    InterviewHistoryOut,
+    NextQuestionOut,
+    StartInterviewIn,
+    StartInterviewOut,
+)
 from app.models.base import get_db
+from app.audit.service import record_event
 
 router = APIRouter(prefix="/interviews", tags=["interview"])
+
+
+@router.get("/history", response_model=list[InterviewHistoryOut])
+def history(
+    user_id: str = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    sessions = (
+        db.query(InterviewSession)
+        .filter(InterviewSession.user_id == uuid.UUID(user_id))
+        .order_by(InterviewSession.created_at.desc())
+        .all()
+    )
+    return [
+        InterviewHistoryOut(
+            session_id=session.id,
+            category=session.category,
+            presentation_type=session.presentation_type,
+            finished=session.finished,
+            answered_count=db.query(InterviewAnswer)
+            .filter(InterviewAnswer.session_id == session.id)
+            .count(),
+            created_at=session.created_at,
+        )
+        for session in sessions
+    ]
 
 
 @router.post("/mock-start", response_model=StartInterviewOut, status_code=status.HTTP_201_CREATED)
@@ -29,6 +62,8 @@ def mock_start(
     db: Session = Depends(get_db),
 ):
     session = service.start_mock_session(db, uuid.UUID(user_id), payload.category)
+    record_event(db, "interview.started", uuid.UUID(user_id), "interview_session", str(session.id), {"category": session.category})
+    db.commit()
     return StartInterviewOut(session_id=session.id, questions=[session.current_question_text])
 
 
@@ -50,6 +85,15 @@ def answer(
     next_question, adapted, finished = service.register_answer_and_get_next(
         db, session, payload.answer_text
     )
+    record_event(
+        db,
+        "interview.answer_submitted",
+        uuid.UUID(user_id),
+        "interview_session",
+        str(session.id),
+        {"adapted": adapted, "finished": finished},
+    )
+    db.commit()
 
     return NextQuestionOut(
         session_id=session.id,

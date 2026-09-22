@@ -103,6 +103,31 @@ Desenvolvimento conduzido com **Scrum** (SCHWABER; SUTHERLAND, 2020), com gestã
 
 O sistema trata dados pessoais do usuário (cadastro, áudio das respostas, transcrições e métricas de oratória). Os áudios são descartados após a transcrição, as senhas são armazenadas com criptografia (bcrypt) e o usuário pode excluir seu histórico a qualquer momento.
 
+## Auditoria e logs
+
+O backend registra eventos relevantes na tabela `audit_logs`. Cada evento pode
+conter usuário, ação, recurso afetado, identificador do recurso, data/hora,
+endereço IP e detalhes adicionais em JSON serializado. São registrados eventos
+de autenticação, início e respostas de entrevistas e alterações no roadmap.
+
+O usuário autenticado consulta seus próprios eventos em `GET /audit/logs`, com
+os filtros `limit` e `action`. A consulta usa o identificador extraído do JWT,
+impedindo que um usuário visualize os logs de outro usuário.
+
+## Roadmap de ensino personalizado
+
+Um roadmap é criado por usuário em `POST /roadmaps`, com objetivo e etapas
+ordenadas. Cada etapa começa como `pending` e pode ser alterada para
+`in_progress` ou `completed` em
+`PATCH /roadmaps/{roadmap_id}/items/{item_id}`. A aplicação pode gerar as
+etapas a partir dos pontos fracos observados nas entrevistas: respostas
+comportamentais curtas viram prática da estrutura STAR, desempenho técnico
+baixo vira revisão do assunto e problemas de clareza viram treino de
+apresentação. `GET /roadmaps` retorna os planos do usuário.
+
+As modalidades `comportamental`, `tecnica`, `mista` e `apresentacao_pessoal`
+possuem regras próprias no prompt do Gemini.
+
 ## Como rodar o projeto localmente
 
 ### Pré-requisitos

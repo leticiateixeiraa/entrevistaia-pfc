@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -28,3 +29,12 @@ class NextQuestionOut(BaseModel):
     # é o que comprova o critério de aceitação da feature 3: "ao menos uma
     # pergunta subsequente é ajustada com base na resposta dada".
     adapted: bool
+
+
+class InterviewHistoryOut(BaseModel):
+    session_id: uuid.UUID
+    category: str
+    presentation_type: str | None
+    finished: bool
+    answered_count: int
+    created_at: datetime
