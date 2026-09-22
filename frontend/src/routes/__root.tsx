@@ -77,14 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EntrevistaIA — Simulador de entrevistas com IA" },
+      { title: "StartAI — Simulador de entrevistas com IA" },
       {
         name: "description",
         content:
           "Simule entrevistas de emprego com perguntas geradas por inteligência artificial, alinhadas à vaga que você deseja.",
       },
-      { name: "author", content: "EntrevistaIA" },
-      { property: "og:title", content: "EntrevistaIA — Simulador de entrevistas com IA" },
+      { name: "author", content: "StartAI" },
+      { property: "og:title", content: "StartAI — Simulador de entrevistas com IA" },
       {
         property: "og:description",
         content:

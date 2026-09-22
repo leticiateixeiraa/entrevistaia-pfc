@@ -5,7 +5,7 @@ import { login, register } from "../services/authService";
 export const Route = createFileRoute("/register")({
   beforeLoad: () => {
     if (localStorage.getItem("access_token")) {
-      throw redirect({ to: "/interview/setup" });
+      throw redirect({ to: "/home" });
     }
   },
   component: RegisterPage,
@@ -32,7 +32,7 @@ function RegisterPage() {
     try {
       await register({ name, email, password });
       await login({ email, password });
-      navigate({ to: "/interview/setup" });
+      navigate({ to: "/home" });
     } catch (requestError: any) {
       setError(requestError?.response?.data?.detail ?? "Não foi possível criar a conta.");
       setIsSubmitting(false);
@@ -45,7 +45,7 @@ function RegisterPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-2xl border border-border bg-card p-7 shadow-sm sm:p-9"
       >
-        <p className="mb-2 text-sm font-semibold tracking-wide text-primary">EntrevistaIA</p>
+        <p className="mb-2 text-sm font-semibold tracking-wide text-primary">StartAI</p>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Crie sua conta</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           Comece a praticar sua comunicação com entrevistas simuladas.
