@@ -153,15 +153,24 @@ venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 ```
 
-Copie o `.env.example` para `.env` e ajuste a senha do seu PostgreSQL:
+Copie o `.env.example` para `.env` e ajuste a senha do seu PostgreSQL. **Por
+segurança, o backend se recusa a iniciar** se `DATABASE_URL` ou
+`JWT_SECRET_KEY` não forem preenchidas com um valor de verdade (o texto de
+exemplo do `.env.example` não é aceito):
 
-```
+​```
 DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/entrevistaia
-JWT_SECRET_KEY=troque-por-uma-chave-secreta-forte
+JWT_SECRET_KEY=
 GEMINI_API_KEY=sua-chave-do-gemini-aqui
+​```
+
+Gere uma `JWT_SECRET_KEY` forte com o comando abaixo e cole o resultado no `.env`:
+
+​```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+​```
 
 Para gerar a `GEMINI_API_KEY`, crie uma chave gratuita em https://aistudio.google.com/apikey.
-```
 
 ### 3. Rode o backend
 
