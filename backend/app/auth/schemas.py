@@ -1,13 +1,14 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 # feat(lgpd): versão vigente do Termo de Uso / Política de Privacidade.
 # Ao publicar uma nova versão dos documentos, incremente este valor
 # para que novos cadastros fiquem vinculados à versão correta.
 CURRENT_TERMS_VERSION = "1.0"
-
+BCRYPT_MAX_BYTES = 72
+PASSWORD_MIN_LENGTH = 8
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -24,7 +25,19 @@ class UserCreate(BaseModel):
                 "É necessário aceitar o Termo de Uso e a Política de Privacidade para se cadastrar."
             )
         return value
-
+    
+    @field_validator("password")
+    @classmethod
+    def validar_forca_da_senha(cls, value: str) -> str:
+        if len(value) < PASSWORD_MIN_LENGTH:
+            raise ValueError(f"A senha precisa ter pelo menos {PASSWORD_MIN_LENGTH} caracteres")
+        if len(value.encode("utf-8")) > BCRYPT_MAX_BYTES:
+            raise ValueError("A senha pode ter no máximo 72 caracteres")
+        if not any(c.isalpha() for c in value) or not any(c.isdigit() for c in value):
+            raise ValueError("A senha precisa conter letras e números")
+        if value.isalnum():
+            raise ValueError("A senha precisa conter também um caractere especial (ex: ! @ # $ %)")
+        return value
 
 class UserLogin(BaseModel):
     email: EmailStr
