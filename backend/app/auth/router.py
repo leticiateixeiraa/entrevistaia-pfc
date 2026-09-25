@@ -6,7 +6,7 @@ feat(auth-backend): implementa endpoint GET /auth/me
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -19,9 +19,15 @@ from app.audit.service import record_event
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+_DUMMY_HASH = hash_password("senha-inexistente-0")
+
+
+def _client_ip(request: Request) -> str | None:
+    return request.client.host if request.client else None
+
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
+def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db)):
     email = str(user_in.email).strip().lower()
     existing = db.query(User).filter(func.lower(User.email) == email).first()
     if existing:
@@ -39,7 +45,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
-    record_event(db, "auth.registered", user.id, "user", str(user.id))
+    record_event(db, "auth.registered", user.id, "user", str(user.id), ip_address=_client_ip(request))
     record_event(
         db,
         "lgpd.consent_accepted",
@@ -53,14 +59,27 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-def login(credentials: UserLogin, db: Session = Depends(get_db)):
+def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db)):
     email = str(credentials.email).strip().lower()
     user = db.query(User).filter(func.lower(User.email) == email).first()
-    if not user or not verify_password(credentials.password, user.hashed_password):
+    password_ok = verify_password(
+        credentials.password, user.hashed_password if user else _DUMMY_HASH
+    )
+    if not user or not password_ok:
+        # A falha também é auditada (sem guardar a senha nem o e-mail digitado).
+        record_event(
+            db,
+            "auth.login_failed",
+            user.id if user else None,
+            "user",
+            str(user.id) if user else None,
+            ip_address=_client_ip(request),
+        )
+        db.commit()
         raise HTTPException(status_code=401, detail="E-mail ou senha inválidos")
 
     access_token = create_access_token(user_id=str(user.id))
-    record_event(db, "auth.login", user.id, "user", str(user.id))
+    record_event(db, "auth.login", user.id, "user", str(user.id), ip_address=_client_ip(request))
     db.commit()
     return Token(access_token=access_token)
 

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { CURRENT_TERMS_VERSION, login, register } from "../services/authService";
+import { getErrorMessage } from "../services/api";
 
 export const Route = createFileRoute("/register")({
   beforeLoad: () => {
@@ -24,11 +25,20 @@ function RegisterPage() {
     event.preventDefault();
     setError(null);
 
+    // Mesmas regras do backend (app/auth/schemas.py). A validação aqui é só
+    // para dar retorno rápido; quem garante a regra de verdade é a API.
     if (password.length < 8) {
       setError("A senha precisa ter pelo menos 8 caracteres.");
       return;
     }
-
+    if (!/[A-Za-zÀ-ÿ]/.test(password) || !/\d/.test(password)) {
+      setError("A senha precisa conter letras e números.");
+      return;
+    }
+    if (/^[A-Za-zÀ-ÿ0-9]+$/.test(password)) {
+      setError("A senha precisa conter também um caractere especial (ex: ! @ # $ %).");
+      return;
+    }
     if (!termsAccepted) {
       setError("Você precisa aceitar o Termo de Uso e a Política de Privacidade para continuar.");
       return;
@@ -46,7 +56,7 @@ function RegisterPage() {
       await login({ email, password });
       navigate({ to: "/home" });
     } catch (requestError: any) {
-      setError(requestError?.response?.data?.detail ?? "Não foi possível criar a conta.");
+      setError(getErrorMessage(requestError, "Não foi possível criar a conta."));
       setIsSubmitting(false);
     }
   }

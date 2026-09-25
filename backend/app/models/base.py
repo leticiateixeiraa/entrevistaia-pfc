@@ -9,11 +9,11 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 load_dotenv()
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:hsegb366@localhost:5432/entrevistaia",
-)
-
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL não configurada. Copie backend/.env.example para backend/.env."
+    )
 engine = create_engine(
     DATABASE_URL,
     connect_args={"options": "-c lc_messages=C"},

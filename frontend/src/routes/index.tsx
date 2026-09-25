@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { login } from "../services/authService";
+import { getErrorMessage } from "../services/api";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
@@ -27,7 +28,7 @@ function LoginPage() {
       await login({ email, password });
       navigate({ to: "/home" });
     } catch (requestError: any) {
-      setError(requestError?.response?.data?.detail ?? "E-mail ou senha inválidos.");
+      setError(getErrorMessage(requestError, "E-mail ou senha inválidos."));
       setIsSubmitting(false);
     }
   }
