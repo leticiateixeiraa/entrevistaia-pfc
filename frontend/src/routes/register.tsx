@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { login, register } from "../services/authService";
+import { CURRENT_TERMS_VERSION, login, register } from "../services/authService";
 
 export const Route = createFileRoute("/register")({
   beforeLoad: () => {
@@ -16,6 +16,7 @@ function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -28,9 +29,20 @@ function RegisterPage() {
       return;
     }
 
+    if (!termsAccepted) {
+      setError("Você precisa aceitar o Termo de Uso e a Política de Privacidade para continuar.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await register({ name, email, password });
+      await register({
+        name,
+        email,
+        password,
+        terms_accepted: termsAccepted,
+        terms_version: CURRENT_TERMS_VERSION,
+      });
       await login({ email, password });
       navigate({ to: "/home" });
     } catch (requestError: any) {
@@ -83,11 +95,31 @@ function RegisterPage() {
           </label>
         </div>
 
+        <label className="mt-6 flex items-start gap-2.5 text-sm text-card-foreground">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(event) => setTermsAccepted(event.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+          />
+          <span>
+            Li e aceito o{" "}
+            <Link to="/termos" target="_blank" className="font-medium text-primary hover:underline">
+              Termo de Uso
+            </Link>{" "}
+            e a{" "}
+            <Link to="/privacidade" target="_blank" className="font-medium text-primary hover:underline">
+              Política de Privacidade
+            </Link>
+            .
+          </span>
+        </label>
+
         {error && <p className="mt-5 text-sm text-destructive" role="alert">{error}</p>}
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !termsAccepted}
           className="mt-7 w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? "Criando..." : "Criar conta"}
