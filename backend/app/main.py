@@ -47,6 +47,18 @@ def on_startup():
                 text("ALTER TABLE interview_sessions ADD COLUMN presentation_type VARCHAR")
             )
 
+    # feat(lgpd): compatibilidade com bancos criados antes do registro de consentimento.
+    user_columns = {column["name"] for column in inspect(engine).get_columns("users")}
+    with engine.begin() as connection:
+        if "terms_accepted_at" not in user_columns:
+            connection.execute(
+                text("ALTER TABLE users ADD COLUMN terms_accepted_at TIMESTAMPTZ")
+            )
+        if "terms_version" not in user_columns:
+            connection.execute(
+                text("ALTER TABLE users ADD COLUMN terms_version VARCHAR(20)")
+            )
+
 
 @app.get("/health")
 def health_check():

@@ -18,3 +18,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     name = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # feat(lgpd): registra o aceite do Termo de Uso / Política de Privacidade
+    terms_accepted_at = Column(DateTime(timezone=True), nullable=True)
+    terms_version = Column(String(20), nullable=True)

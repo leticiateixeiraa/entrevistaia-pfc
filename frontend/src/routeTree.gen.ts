@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as InterviewQuestionsRouteImport } from './routes/interview/questions'
 import { Route as InterviewSetupRouteImport } from './routes/interview/setup'
 import { Route as AuditRouteImport } from './routes/audit'
@@ -21,9 +23,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InterviewQuestionsRoute = InterviewQuestionsRouteImport.update({
@@ -50,6 +62,8 @@ const HomeRoute = HomeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
+  '/termos': typeof TermosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
   '/audit': typeof AuditRoute
@@ -58,6 +72,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
+  '/termos': typeof TermosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
   '/audit': typeof AuditRoute
@@ -67,6 +83,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
+  '/termos': typeof TermosRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
   '/audit': typeof AuditRoute
@@ -74,15 +92,17 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/register' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
+  fullPaths: '/' | '/register' | '/termos' | '/privacidade' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/register' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
-  id: '__root__' | '/' | '/register' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
+  to: '/' | '/register' | '/termos' | '/privacidade' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
+  id: '__root__' | '/' | '/register' | '/termos' | '/privacidade' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RegisterRoute: typeof RegisterRoute
+  TermosRoute: typeof TermosRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   InterviewQuestionsRoute: typeof InterviewQuestionsRoute
   InterviewSetupRoute: typeof InterviewSetupRoute
 }
@@ -101,6 +121,20 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/interview/questions': {
@@ -137,6 +171,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RegisterRoute: RegisterRoute,
+  TermosRoute: TermosRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   InterviewQuestionsRoute: InterviewQuestionsRoute,
   InterviewSetupRoute: InterviewSetupRoute,
   AuditRoute: AuditRoute,
