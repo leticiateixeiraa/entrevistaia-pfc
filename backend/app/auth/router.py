@@ -4,6 +4,7 @@ feat(auth-backend): implementa endpoint POST /auth/login com JWT
 feat(auth-backend): implementa endpoint GET /auth/me
 """
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
@@ -30,11 +31,23 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         email=email,
         hashed_password=hash_password(user_in.password),
         name=user_in.name,
+        # feat(lgpd): consentimento é pré-requisito para o cadastro
+        # (validado em UserCreate.must_accept_terms).
+        terms_accepted_at=datetime.now(timezone.utc),
+        terms_version=user_in.terms_version,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
     record_event(db, "auth.registered", user.id, "user", str(user.id))
+    record_event(
+        db,
+        "lgpd.consent_accepted",
+        user.id,
+        "user",
+        str(user.id),
+        {"terms_version": user_in.terms_version},
+    )
     db.commit()
     return user
 
