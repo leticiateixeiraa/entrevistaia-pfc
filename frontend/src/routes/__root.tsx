@@ -112,6 +112,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// feat(lgpd): rodapé com links para Termo de Uso e Política de Privacidade,
+// visível em qualquer tela do sistema (não só durante o cadastro).
+function SiteFooter() {
+  return (
+    <footer className="border-t border-border bg-background px-4 py-4 text-center text-xs text-muted-foreground">
+      <Link to="/termos" className="text-primary hover:underline">
+        Termo de Uso
+      </Link>
+      {" · "}
+      <Link to="/privacidade" className="text-primary hover:underline">
+        Política de Privacidade
+      </Link>
+    </footer>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -119,6 +135,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <SiteFooter />
     </QueryClientProvider>
   );
 }
