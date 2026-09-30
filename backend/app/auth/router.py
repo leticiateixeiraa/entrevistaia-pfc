@@ -4,7 +4,7 @@ feat(auth-backend): implementa endpoint POST /auth/login com JWT
 feat(auth-backend): implementa endpoint GET /auth/me
 """
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func
@@ -12,14 +12,29 @@ from sqlalchemy.orm import Session
 
 from app.models.base import get_db
 from app.auth.dependencies import get_current_user
-from app.auth.models import User
-from app.auth.schemas import UserCreate, UserLogin, UserOut, Token
-from app.auth.service import hash_password, verify_password, create_access_token
+from app.auth.models import PasswordResetToken, User
+from app.auth.schemas import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    Token,
+    UserCreate,
+    UserLogin,
+    UserOut,
+)
+from app.auth.service import (
+    RESET_TOKEN_EXPIRE_MINUTES,
+    criar_hash_senha,
+    criar_token_acesso,
+    gerar_hash_token,
+    gerar_token_redefinicao,
+    verificar_senha,
+)
+from app.auth.email_service import ErroEnvioEmail, enviar_email_redefinicao_senha
 from app.audit.service import record_event
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-_DUMMY_HASH = hash_password("senha-inexistente-0")
+_DUMMY_HASH = criar_hash_senha("senha-inexistente-0")
 
 
 def _client_ip(request: Request) -> str | None:
@@ -35,7 +50,7 @@ def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db
 
     user = User(
         email=email,
-        hashed_password=hash_password(user_in.password),
+        hashed_password=criar_hash_senha(user_in.password),
         name=user_in.name,
         # feat(lgpd): consentimento é pré-requisito para o cadastro
         # (validado em UserCreate.must_accept_terms).
@@ -62,10 +77,10 @@ def register(user_in: UserCreate, request: Request, db: Session = Depends(get_db
 def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db)):
     email = str(credentials.email).strip().lower()
     user = db.query(User).filter(func.lower(User.email) == email).first()
-    password_ok = verify_password(
+    senha_ok = verificar_senha(
         credentials.password, user.hashed_password if user else _DUMMY_HASH
     )
-    if not user or not password_ok:
+    if not user or not senha_ok:
         # A falha também é auditada (sem guardar a senha nem o e-mail digitado).
         record_event(
             db,
@@ -78,10 +93,11 @@ def login(credentials: UserLogin, request: Request, db: Session = Depends(get_db
         db.commit()
         raise HTTPException(status_code=401, detail="E-mail ou senha inválidos")
 
-    access_token = create_access_token(user_id=str(user.id))
+    access_token = criar_token_acesso(id_usuario=str(user.id))
     record_event(db, "auth.login", user.id, "user", str(user.id), ip_address=_client_ip(request))
     db.commit()
     return Token(access_token=access_token)
+
 
 @router.get("/me", response_model=UserOut)
 def me(user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -89,3 +105,53 @@ def me(user_id: str = Depends(get_current_user), db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     return user
+
+
+@router.post("/forgot-password")
+def esqueci_senha(payload: ForgotPasswordRequest, request: Request, db: Session = Depends(get_db)):
+    email = str(payload.email).strip().lower()
+    user = db.query(User).filter(func.lower(User.email) == email).first()
+
+    resposta = {"message": "Se esse e-mail estiver cadastrado, você vai receber um link de redefinição."}
+
+    if not user:
+        return resposta
+
+    token_bruto, hash_token = gerar_token_redefinicao()
+    db.add(PasswordResetToken(
+        user_id=user.id,
+        token_hash=hash_token,
+        expires_at=datetime.now(timezone.utc) + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES),
+    ))
+    record_event(db, "auth.password_reset_requested", user.id, "user", str(user.id), ip_address=_client_ip(request))
+    db.commit()
+
+    try:
+        enviar_email_redefinicao_senha(user.email, token_bruto)
+    except ErroEnvioEmail as exc:
+        raise HTTPException(status_code=502, detail="Não foi possível enviar o e-mail agora. Tente de novo mais tarde.") from exc
+
+    return resposta
+
+
+@router.post("/reset-password")
+def redefinir_senha(payload: ResetPasswordRequest, request: Request, db: Session = Depends(get_db)):
+    hash_token = gerar_hash_token(payload.token)
+    token_redefinicao = db.query(PasswordResetToken).filter(PasswordResetToken.token_hash == hash_token).first()
+
+    invalido = (
+        not token_redefinicao
+        or token_redefinicao.used_at is not None
+        or token_redefinicao.expires_at < datetime.now(timezone.utc)
+    )
+    if invalido:
+        raise HTTPException(status_code=400, detail="Link inválido ou expirado. Solicite uma nova redefinição.")
+
+    user = db.query(User).filter(User.id == token_redefinicao.user_id).first()
+    user.hashed_password = criar_hash_senha(payload.new_password)
+    token_redefinicao.used_at = datetime.now(timezone.utc)
+
+    record_event(db, "auth.password_reset_completed", user.id, "user", str(user.id), ip_address=_client_ip(request))
+    db.commit()
+
+    return {"message": "Senha redefinida com sucesso."}
