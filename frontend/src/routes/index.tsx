@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { login } from "../services/authService";
+import { entrar } from "../services/authService";
 import { getErrorMessage } from "../services/api";
 
 export const Route = createFileRoute("/")({
@@ -25,7 +25,7 @@ function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ email, password });
+      await entrar({ email, password });
       navigate({ to: "/home" });
     } catch (requestError: any) {
       setError(getErrorMessage(requestError, "E-mail ou senha inválidos."));
@@ -68,6 +68,12 @@ function LoginPage() {
             />
           </label>
         </div>
+        
+        <p className="mt-3 text-right text-sm">
+          <Link to="/forgot-password" className="font-medium text-primary hover:underline">
+            Esqueci minha senha
+          </Link>
+        </p>
 
         {error && <p className="mt-5 text-sm text-destructive" role="alert">{error}</p>}
 

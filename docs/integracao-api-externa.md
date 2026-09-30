@@ -1,7 +1,5 @@
 # Integração com API externa — Google Gemini
 
-Entrega da Sprint 2 (28/09/2026) — item 4 do roteiro.
-
 ## Visão geral
 
 O StartAI usa a API do **Google Gemini** para gerar e adaptar dinamicamente

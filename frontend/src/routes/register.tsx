@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { CURRENT_TERMS_VERSION, login, register } from "../services/authService";
+import { CURRENT_TERMS_VERSION, entrar, cadastrar } from "../services/authService";
 import { getErrorMessage } from "../services/api";
 
 export const Route = createFileRoute("/register")({
@@ -46,14 +46,14 @@ function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      await register({
+      await cadastrar({
         name,
         email,
         password,
         terms_accepted: termsAccepted,
         terms_version: CURRENT_TERMS_VERSION,
       });
-      await login({ email, password });
+      await entrar({ email, password });
       navigate({ to: "/home" });
     } catch (requestError: any) {
       setError(getErrorMessage(requestError, "Não foi possível criar a conta."));

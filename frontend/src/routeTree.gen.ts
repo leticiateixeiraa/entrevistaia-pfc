@@ -10,22 +10,39 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TermosRouteImport } from './routes/termos'
-import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AuditRouteImport } from './routes/audit'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as InterviewQuestionsRouteImport } from './routes/interview/questions'
 import { Route as InterviewSetupRouteImport } from './routes/interview/setup'
-import { Route as AuditRouteImport } from './routes/audit'
-import { Route as HomeRouteImport } from './routes/home'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TermosRoute = TermosRouteImport.update({
-  id: '/termos',
-  path: '/termos',
+const AuditRoute = AuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -33,9 +50,14 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacidadeRoute = PrivacidadeRouteImport.update({
-  id: '/privacidade',
-  path: '/privacidade',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InterviewQuestionsRoute = InterviewQuestionsRouteImport.update({
@@ -48,61 +70,92 @@ const InterviewSetupRoute = InterviewSetupRouteImport.update({
   path: '/interview/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuditRoute = AuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/register': typeof RegisterRoute
-  '/termos': typeof TermosRoute
+  '/audit': typeof AuditRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/home': typeof HomeRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/termos': typeof TermosRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
-  '/audit': typeof AuditRoute
-  '/home': typeof HomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/register': typeof RegisterRoute
-  '/termos': typeof TermosRoute
+  '/audit': typeof AuditRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/home': typeof HomeRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/termos': typeof TermosRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
-  '/audit': typeof AuditRoute
-  '/home': typeof HomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/register': typeof RegisterRoute
-  '/termos': typeof TermosRoute
+  '/audit': typeof AuditRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/home': typeof HomeRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/termos': typeof TermosRoute
   '/interview/questions': typeof InterviewQuestionsRoute
   '/interview/setup': typeof InterviewSetupRoute
-  '/audit': typeof AuditRoute
-  '/home': typeof HomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/register' | '/termos' | '/privacidade' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
+  fullPaths:
+    | '/'
+    | '/audit'
+    | '/forgot-password'
+    | '/home'
+    | '/privacidade'
+    | '/register'
+    | '/reset-password'
+    | '/termos'
+    | '/interview/questions'
+    | '/interview/setup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/register' | '/termos' | '/privacidade' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
-  id: '__root__' | '/' | '/register' | '/termos' | '/privacidade' | '/interview/questions' | '/interview/setup' | '/audit' | '/home'
+  to:
+    | '/'
+    | '/audit'
+    | '/forgot-password'
+    | '/home'
+    | '/privacidade'
+    | '/register'
+    | '/reset-password'
+    | '/termos'
+    | '/interview/questions'
+    | '/interview/setup'
+  id:
+    | '__root__'
+    | '/'
+    | '/audit'
+    | '/forgot-password'
+    | '/home'
+    | '/privacidade'
+    | '/register'
+    | '/reset-password'
+    | '/termos'
+    | '/interview/questions'
+    | '/interview/setup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  RegisterRoute: typeof RegisterRoute
-  TermosRoute: typeof TermosRoute
+  AuditRoute: typeof AuditRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HomeRoute: typeof HomeRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  TermosRoute: typeof TermosRoute
   InterviewQuestionsRoute: typeof InterviewQuestionsRoute
   InterviewSetupRoute: typeof InterviewSetupRoute
 }
@@ -116,18 +169,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
+    '/audit': {
+      id: '/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AuditRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/termos': {
-      id: '/termos'
-      path: '/termos'
-      fullPath: '/termos'
-      preLoaderRoute: typeof TermosRouteImport
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -135,6 +195,27 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/interview/questions': {
@@ -151,43 +232,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InterviewSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/audit': {
-      id: '/audit'
-      path: '/audit'
-      fullPath: '/audit'
-      preLoaderRoute: typeof AuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  RegisterRoute: RegisterRoute,
-  TermosRoute: TermosRoute,
+  AuditRoute: AuditRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  HomeRoute: HomeRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  TermosRoute: TermosRoute,
   InterviewQuestionsRoute: InterviewQuestionsRoute,
   InterviewSetupRoute: InterviewSetupRoute,
-  AuditRoute: AuditRoute,
-  HomeRoute: HomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
