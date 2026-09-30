@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ErrorState } from "@/components/interview/ErrorState";
 import { InterviewForm, type InterviewFormValues } from "@/components/interview/InterviewForm";
@@ -14,13 +14,13 @@ export const Route = createFileRoute("/interview/setup")({
   },
   head: () => ({
     meta: [
-      { title: "Prepare sua entrevista — EntrevistaIA" },
+      { title: "Prepare sua entrevista — StartAI" },
       {
         name: "description",
         content:
           "Personalize sua simulação de entrevista e deixe a IA preparar perguntas alinhadas à oportunidade que você deseja.",
       },
-      { property: "og:title", content: "Prepare sua entrevista — EntrevistaIA" },
+      { property: "og:title", content: "Prepare sua entrevista — StartAI" },
       {
         property: "og:description",
         content:
@@ -67,7 +67,7 @@ function InterviewSetupPage() {
     <main className="flex min-h-screen flex-col items-center bg-background px-4 py-12 sm:py-20">
       <div className="w-full max-w-xl">
         <header className="mb-8 text-center">
-          <p className="mb-2 text-sm font-semibold tracking-wide text-primary">EntrevistaIA</p>
+          <p className="mb-2 text-sm font-semibold tracking-wide text-primary">StartAI</p>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Prepare sua entrevista
           </h1>
@@ -75,6 +75,9 @@ function InterviewSetupPage() {
             Personalize sua simulação e deixe a IA preparar perguntas alinhadas à oportunidade que
             você deseja.
           </p>
+          <Link to="/home" className="mt-4 inline-block text-sm font-medium text-muted-foreground hover:text-foreground">
+            Voltar ao início
+          </Link>
         </header>
 
         {errorMessage && !isSubmitting ? (

@@ -24,6 +24,7 @@ def _criar_usuario_autenticado(client: TestClient, prefixo: str) -> dict:
         "email": email_unico(prefixo),
         "password": "senha-forte-123",
         "name": "Usuário de Teste",
+        "terms_accepted": True,
     }
     client.post("/auth/register", json=payload)
     login_response = client.post(

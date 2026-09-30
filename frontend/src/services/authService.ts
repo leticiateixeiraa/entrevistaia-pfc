@@ -2,10 +2,16 @@
 
 import api from "./api";
 
+// feat(lgpd): versão vigente do Termo de Uso / Política de Privacidade,
+// deve acompanhar a constante equivalente no backend (auth/schemas.py).
+export const CURRENT_TERMS_VERSION = "1.0";
+
 export interface RegisterPayload {
   email: string;
   password: string;
   name?: string;
+  terms_accepted: boolean;
+  terms_version?: string;
 }
 
 export interface LoginPayload {

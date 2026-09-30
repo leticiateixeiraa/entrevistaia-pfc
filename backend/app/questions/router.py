@@ -9,6 +9,7 @@ from app.models.base import get_db
 from app.questions import service
 from app.questions.llm_service import LLMGenerationError
 from app.questions.schemas import CategoryOut, InterviewSessionOut, StartInterviewIn
+from app.audit.service import record_event
 
 
 router = APIRouter(tags=["questions"])
@@ -50,6 +51,15 @@ def start_interview(
         .order_by(InterviewQuestion.order_index)
         .all()
     )
+    record_event(
+        db,
+        "interview.started",
+        uuid.UUID(user_id),
+        "interview_session",
+        str(session.id),
+        {"presentation_type": payload.presentation_type, "category": category},
+    )
+    db.commit()
     return InterviewSessionOut(
         session_id=session.id,
         questions=[question.text for question in questions],

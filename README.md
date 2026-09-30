@@ -1,4 +1,4 @@
-# EntrevistaIA
+# StartAI
 
 **Simulador Inteligente de Entrevistas e Apresentações com Feedback de Oratória por Inteligência Artificial**
 
@@ -12,7 +12,7 @@ Projeto Final de Curso (PFC) — Bacharelado em Engenharia de Software, Universi
 
 A comunicação oral é um dos fatores mais relevantes para o sucesso em entrevistas de emprego, apresentações acadêmicas e processos seletivos, mas grande parte dos estudantes não tem acesso a ambientes de treinamento que permitam praticar essas situações e receber retorno objetivo sobre o próprio desempenho.
 
-O **EntrevistaIA** propõe resolver essa lacuna com uma plataforma web que:
+O **StartAI** propõe resolver essa lacuna com uma plataforma web que:
 - gera perguntas dinamicamente por meio de Inteligência Artificial, adaptadas à vaga ou ao tipo de apresentação escolhida;
 - transcreve as respostas faladas usando reconhecimento automático de fala (Speech-to-Text);
 - analisa a oratória do usuário, identificando métricas como vícios de linguagem, palavras repetidas, duração e velocidade da fala;
@@ -72,11 +72,11 @@ O sistema segue o modelo cliente-servidor, dividido em camadas de apresentação
 
 | Categoria | Tecnologia |
 |---|---|
-| Front-end | React.js (TypeScript), Vite, TailwindCSS |
+| Front-end | React.js (TypeScript), Vite, TanStack Router/Start, TailwindCSS, shadcn/ui |
 | Back-end | Python, FastAPI |
 | Banco de dados | PostgreSQL, com SQLAlchemy (ORM) |
 | Filas / cache | Redis |
-| APIs de IA | OpenAI Whisper (Speech-to-Text); LLM para geração e adaptação de perguntas |
+| APIs de IA | OpenAI Whisper (Speech-to-Text); Google Gemini para geração e adaptação de perguntas |
 | Testes | Pytest (back-end); Jest / React Testing Library (front-end) |
 | Segurança | JWT, bcrypt |
 | Versionamento | Git e GitHub |
@@ -103,6 +103,31 @@ Desenvolvimento conduzido com **Scrum** (SCHWABER; SUTHERLAND, 2020), com gestã
 
 O sistema trata dados pessoais do usuário (cadastro, áudio das respostas, transcrições e métricas de oratória). Os áudios são descartados após a transcrição, as senhas são armazenadas com criptografia (bcrypt) e o usuário pode excluir seu histórico a qualquer momento.
 
+## Auditoria e logs
+
+O backend registra eventos relevantes na tabela `audit_logs`. Cada evento pode
+conter usuário, ação, recurso afetado, identificador do recurso, data/hora,
+endereço IP e detalhes adicionais em JSON serializado. São registrados eventos
+de autenticação, início e respostas de entrevistas e alterações no roadmap.
+
+O usuário autenticado consulta seus próprios eventos em `GET /audit/logs`, com
+os filtros `limit` e `action`. A consulta usa o identificador extraído do JWT,
+impedindo que um usuário visualize os logs de outro usuário.
+
+## Roadmap de ensino personalizado
+
+Um roadmap é criado por usuário em `POST /roadmaps`, com objetivo e etapas
+ordenadas. Cada etapa começa como `pending` e pode ser alterada para
+`in_progress` ou `completed` em
+`PATCH /roadmaps/{roadmap_id}/items/{item_id}`. A aplicação pode gerar as
+etapas a partir dos pontos fracos observados nas entrevistas: respostas
+comportamentais curtas viram prática da estrutura STAR, desempenho técnico
+baixo vira revisão do assunto e problemas de clareza viram treino de
+apresentação. `GET /roadmaps` retorna os planos do usuário.
+
+As modalidades `comportamental`, `tecnica`, `mista` e `apresentacao_pessoal`
+possuem regras próprias no prompt do Gemini.
+
 ## Como rodar o projeto localmente
 
 ### Pré-requisitos
@@ -128,15 +153,24 @@ venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 ```
 
-Copie o `.env.example` para `.env` e ajuste a senha do seu PostgreSQL:
+Copie o `.env.example` para `.env` e ajuste a senha do seu PostgreSQL. **Por
+segurança, o backend se recusa a iniciar** se `DATABASE_URL` ou
+`JWT_SECRET_KEY` não forem preenchidas com um valor de verdade (o texto de
+exemplo do `.env.example` não é aceito):
 
-```
+​```
 DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/entrevistaia
-JWT_SECRET_KEY=troque-por-uma-chave-secreta-forte
-PGOPTIONS=-c lc_messages=C
-```
+JWT_SECRET_KEY=
+GEMINI_API_KEY=sua-chave-do-gemini-aqui
+​```
 
-> A linha `PGOPTIONS=-c lc_messages=C` evita um erro de `UnicodeDecodeError` que acontece em instalações de PostgreSQL com mensagens de erro em português.
+Gere uma `JWT_SECRET_KEY` forte com o comando abaixo e cole o resultado no `.env`:
+
+​```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+​```
+
+Para gerar a `GEMINI_API_KEY`, crie uma chave gratuita em https://aistudio.google.com/apikey.
 
 ### 3. Rode o backend
 

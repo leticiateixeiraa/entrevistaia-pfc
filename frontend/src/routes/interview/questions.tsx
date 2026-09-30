@@ -14,12 +14,12 @@ export const Route = createFileRoute("/interview/questions")({
   },
   head: () => ({
     meta: [
-      { title: "Entrevista simulada — EntrevistaIA" },
+      { title: "Entrevista simulada — StartAI" },
       {
         name: "description",
         content: "Navegue pelas perguntas geradas pela IA para a sua entrevista simulada.",
       },
-      { property: "og:title", content: "Entrevista simulada — EntrevistaIA" },
+      { property: "og:title", content: "Entrevista simulada — StartAI" },
       {
         property: "og:description",
         content: "Navegue pelas perguntas geradas pela IA para a sua entrevista simulada.",
@@ -75,7 +75,7 @@ function InterviewQuestionsPage() {
       const result = await submitAnswer(response.session_id, answer.trim());
       if (result.finished || isLast) {
         clearInterviewSession();
-        navigate({ to: "/interview/setup" });
+        navigate({ to: "/home" });
         return;
       }
       setAnswer("");

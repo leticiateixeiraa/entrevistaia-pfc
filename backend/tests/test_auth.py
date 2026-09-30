@@ -31,6 +31,7 @@ def test_register_and_login():
             "email": email_unico("teste_leticia"),
             "password": "senha-forte-123",
             "name": "Usuária de Teste",
+            "terms_accepted": True,
         }
 
         register_response = client.post("/auth/register", json=payload)
@@ -50,7 +51,11 @@ def test_login_com_senha_errada_falha():
         email = email_unico("outra_leticia")
         client.post(
             "/auth/register",
-            json={"email": email, "password": "senha-forte-123"},
+            json={
+                "email": email,
+                "password": "senha-forte-123",
+                "terms_accepted": True,
+            },
         )
         response = client.post(
             "/auth/login",
@@ -62,9 +67,10 @@ def test_login_com_senha_errada_falha():
 def test_me_retorna_usuario_autenticado():
     with TestClient(app) as client:
         payload = {
-            "email": email_unico("me_leticia"),
+            "email": email_unico("teste_leticia"),
             "password": "senha-forte-123",
-            "name": "Usuária Me",
+            "name": "Usuária de Teste",
+            "terms_accepted": True,
         }
         client.post("/auth/register", json=payload)
         login_response = client.post(

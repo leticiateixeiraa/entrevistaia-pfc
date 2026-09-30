@@ -13,3 +13,5 @@ frontend/.env
 # Geral
 .DS_Store
 *.pyc
+
+.vscode/

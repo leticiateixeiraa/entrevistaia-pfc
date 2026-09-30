@@ -17,4 +17,33 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Token expirado ou inválido: o backend responde 401. Sem isto, as rotas do
+// front continuariam achando que o usuário está logado (elas só checam se
+// existe token no localStorage). O login fica de fora porque lá o 401
+// significa "senha errada", e a própria tela mostra a mensagem.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isLoginRequest = error?.config?.url?.includes("/auth/login");
+    if (error?.response?.status === 401 && !isLoginRequest) {
+      localStorage.removeItem("access_token");
+      window.location.assign("/");
+    }
+    return Promise.reject(error);
+  },
+);
+
+// O FastAPI devolve `detail` como texto (erros nossos) ou como lista
+// (erros de validação 422, como a senha fraca). Esta função sempre devolve
+// um texto exibível, nos dois casos.
+export function getErrorMessage(error: unknown, fallback: string): string {
+  const detail = (error as any)?.response?.data?.detail;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail) && detail.length > 0) {
+    const msg = String(detail[0]?.msg ?? "");
+    return msg.replace(/^Value error, /, "") || fallback;
+  }
+  return fallback;
+}
+
 export default api;

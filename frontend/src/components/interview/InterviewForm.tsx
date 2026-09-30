@@ -17,6 +17,7 @@ export function InterviewForm({ isSubmitting, onSubmit }: InterviewFormProps) {
   const [presentationType, setPresentationType] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const selectedType = PRESENTATION_TYPES.find((type) => type.value === presentationType);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,6 +89,12 @@ export function InterviewForm({ isSubmitting, onSubmit }: InterviewFormProps) {
             <span className="text-xs text-muted-foreground">{jobDescription.length} caracteres</span>
           )}
         </div>
+        {selectedType && (
+          <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm text-primary">
+            <p className="font-semibold">A IA vai conduzir uma entrevista {selectedType.label.toLowerCase()}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{selectedType.description}</p>
+          </div>
+        )}
         <textarea
           id="job-description"
           value={jobDescription}

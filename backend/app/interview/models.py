@@ -31,6 +31,7 @@ class InterviewSession(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
     category = Column(String, nullable=False)
+    presentation_type = Column(String, nullable=True)
 
     # Índice da próxima pergunta "fixa" do banco (QUESTION_BANK) a ser usada
     # quando não há adaptação. Não avança quando uma pergunta adaptada é

@@ -2,9 +2,15 @@ import uuid
 
 from sqlalchemy.orm import Session
 
-from app.interview import service as interview_service
 from app.interview.models import InterviewQuestion, InterviewSession
 from app.questions.llm_service import generate_questions
+
+PRESENTATION_TYPES = {
+    "comportamental",
+    "tecnica",
+    "mista",
+    "apresentacao_pessoal",
+}
 
 
 CATEGORIES = [
@@ -36,10 +42,13 @@ def start_interview(
     valid_ids = {item["id"] for item in CATEGORIES}
     if category not in valid_ids:
         raise ValueError("Categoria de entrevista inválida")
+    if presentation_type not in PRESENTATION_TYPES:
+        raise ValueError("Tipo de entrevista inválido")
     questions = generate_questions(job_title, presentation_type, job_description)
     session = InterviewSession(
         user_id=user_id,
         category=category,
+        presentation_type=presentation_type,
         current_index=0,
         current_question_text=questions[0],
         finished=False,
