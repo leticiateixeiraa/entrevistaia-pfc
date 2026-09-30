@@ -128,6 +128,19 @@ apresentação. `GET /roadmaps` retorna os planos do usuário.
 As modalidades `comportamental`, `tecnica`, `mista` e `apresentacao_pessoal`
 possuem regras próprias no prompt do Gemini.
 
+## Recuperação de senha
+
+O usuário pode redefinir a própria senha em caso de esquecimento, a partir
+da tela de login. Em `POST /auth/forgot-password`, o sistema gera um token
+aleatório, armazena apenas o hash desse token no banco (nunca o valor em
+texto puro) e envia por e-mail um link válido por 30 minutos.
+
+Ao acessar o link, o usuário define a nova senha em
+`POST /auth/reset-password`, seguindo as mesmas regras de senha forte do
+cadastro. O token só pode ser usado uma vez, e a resposta da API é sempre a
+mesma, com ou sem e-mail cadastrado — protegendo contra a descoberta de
+quais e-mails têm conta no sistema.
+
 ## Como rodar o projeto localmente
 
 ### Pré-requisitos
@@ -171,6 +184,22 @@ python -c "import secrets; print(secrets.token_urlsafe(48))"
 ​```
 
 Para gerar a `GEMINI_API_KEY`, crie uma chave gratuita em https://aistudio.google.com/apikey.
+
+Para o envio de e-mails de recuperação de senha, configure também as
+variáveis de SMTP:
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=seu-email@gmail.com
+SMTP_PASSWORD=
+FRONTEND_URL=http://localhost:5173
+
+Se usar o Gmail, `SMTP_PASSWORD` precisa ser uma **senha de app** (não a
+senha normal da conta), gerada em
+https://myaccount.google.com/apppasswords — exige verificação em duas
+etapas ativada na conta. Sem essas variáveis configuradas, o cadastro e o
+login continuam funcionando normalmente; só o fluxo de "esqueci minha
+senha" fica indisponível.
 
 ### 3. Rode o backend
 

@@ -25,12 +25,12 @@ export interface CurrentUser {
   name: string | null;
 }
 
-export async function register(payload: RegisterPayload) {
+export async function cadastrar(payload: RegisterPayload) {
   const { data } = await api.post("/auth/register", payload);
   return data;
 }
 
-export async function login(payload: LoginPayload) {
+export async function entrar(payload: LoginPayload) {
   const { data } = await api.post<{ access_token: string; token_type: string }>(
     "/auth/login",
     payload
@@ -50,5 +50,15 @@ export function isAuthenticated(): boolean {
 // feat(auth-frontend): busca os dados do usuário autenticado (GET /auth/me)
 export async function getCurrentUser(): Promise<CurrentUser> {
   const { data } = await api.get<CurrentUser>("/auth/me");
+  return data;
+}
+
+export async function esqueciSenha(email: string) {
+  const { data } = await api.post("/auth/forgot-password", { email });
+  return data;
+}
+
+export async function redefinirSenha(token: string, novaSenha: string) {
+  const { data } = await api.post("/auth/reset-password", { token, new_password: novaSenha });
   return data;
 }

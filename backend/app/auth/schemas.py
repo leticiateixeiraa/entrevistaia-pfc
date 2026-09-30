@@ -56,3 +56,24 @@ class UserOut(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def validar_forca_da_senha(cls, value: str) -> str:
+        if len(value) < PASSWORD_MIN_LENGTH:
+            raise ValueError(f"A senha precisa ter pelo menos {PASSWORD_MIN_LENGTH} caracteres")
+        if len(value.encode("utf-8")) > BCRYPT_MAX_BYTES:
+            raise ValueError("A senha pode ter no máximo 72 caracteres")
+        if not any(c.isalpha() for c in value) or not any(c.isdigit() for c in value):
+            raise ValueError("A senha precisa conter letras e números")
+        if value.isalnum():
+            raise ValueError("A senha precisa conter também um caractere especial (ex: ! @ # $ %)")
+        return value
